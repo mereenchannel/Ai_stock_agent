@@ -28,7 +28,7 @@ st.markdown("""
     
     /* กล่องข้อมูล */
     div[data-testid="stMetricValue"] { color: #00b4db; font-size: 24px; }
-    div[data-testid="stMetricLabel"] { color: #8f9cae; }
+    div[data-testid="stMetricLabel"] { color: #effcff; }
     </style>
 """, unsafe_allow_html=True)
 
