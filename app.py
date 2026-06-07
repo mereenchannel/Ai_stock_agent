@@ -9,13 +9,14 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 st.set_page_config(page_title="AI Quant Trading Agent", page_icon="📈", layout="wide")
 
 st.markdown("""
-    <style>
+        <style>
+    /* --- 1. ซ่อนเมนู Streamlit และตั้งค่าพื้นหลัง Dark Mode --- */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-    .stApp {background-color: #0b0e14; color: #ffffff;} /* ธีม Dark Mode ของกระดานเทรด */
+    .stApp {background-color: #0b0e14; color: #ffffff;}
     
-    /* ตกแต่งปุ่มกดส่งคำสั่ง */
+    /* --- 2. ตกแต่งปุ่มกดส่งคำสั่ง --- */
     .stButton>button {
         background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
         color: white; font-size: 16px; font-weight: bold; border-radius: 8px;
@@ -25,31 +26,50 @@ st.markdown("""
         background: linear-gradient(135deg, #0083b0 0%, #00b4db 100%);
         box-shadow: 0 6px 20px rgba(0,180,219,0.5);
     }
-    
-    /* กล่องข้อมูล */
-    div[data-testid="stMetricValue"] { color: #00b4db; font-size: 24px; }
-    div[data-testid="stMetricLabel"] { color: #effcff; }
-        /* 1. เปลี่ยนสีพื้นหลัง สีขอบ และสีตัวหนังสือในกล่อง Text Input */
+
+    /* --- 3. ตกแต่งกล่องกรอกชื่อหุ้น (Text Input) --- */
     div[data-testid="stTextInput"] input {
-        background-color: #1e293b !important; /* สีพื้นหลังกล่องแบบเข้ม */
-        color: #00b4db !important; /* สีตัวหนังสือตอนพิมพ์ (ใช้สีฟ้าสว่างให้เด่น) */
-        border: 1px solid #475569 !important; /* สีขอบกล่องปกติ */
+        background-color: #1e293b !important;
+        color: #00b4db !important; 
+        border: 1px solid #475569 !important;
         border-radius: 8px !important;
     }
-    
-    /* 2. เอฟเฟกต์ตอนที่ผู้ใช้คลิกพิมพ์ (Focus) */
     div[data-testid="stTextInput"] input:focus {
-        border: 2px solid #00b4db !important; /* ขอบเรืองแสงสีฟ้า */
+        border: 2px solid #00b4db !important;
         box-shadow: 0 0 10px rgba(0, 180, 219, 0.3) !important;
     }
-    
-    /* 3. เปลี่ยนสีข้อความกำกับ (Label) ด้านบนกล่อง */
     div[data-testid="stTextInput"] label p {
-        color: #8f9cae !important; /* สีเทาสว่างให้อ่านง่าย */
+        color: #8f9cae !important;
         font-weight: bold;
     }
-    
+
+    /* --- 4. ปรับสีตัวอักษรทั่วไป (รวมถึงบทวิเคราะห์ AI) ให้อ่านง่ายบนพื้นดำ --- */
+    p, li {
+        color: #e2e8f0;
+    }
+    div[data-testid="stAlert"] p, div[data-testid="stAlert"] li {
+        color: #ffffff !important;
+    }
+
+    /* --- 5. แก้สีหัวข้อและตัวเลขกล่องข้อมูล (Metrics) --- */
+    div[data-testid="stMetricLabel"] > div, div[data-testid="stMetricLabel"] p {
+        color: #ffffff !important; 
+        font-size: 16px !important; 
+        font-weight: 500 !important;
+    }
+    div[data-testid="stMetricValue"] { 
+        color: #00b4db !important; 
+        font-size: 28px !important; 
+    }
+
+    /* --- 6. ซ่อนกล่อง Tooltip ที่เด้งบังตัวหนังสือเวลากราฟทำงาน --- */
+    #vg-tooltip-element {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
     </style>
+
 """, unsafe_allow_html=True)
 
 # --- ส่วนหัวแอปพลิเคชัน ---
