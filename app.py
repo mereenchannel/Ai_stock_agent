@@ -61,8 +61,8 @@ def calculate_mcdx_banker(df):
 col_input1, col_input2 = st.columns([1, 2])
 
 with col_input1:
-    st.markdown("### 🛠️ ตั้งค่าบอทเทรด")
-    ticker = st.text_input("🔤 ใส่สัญลักษณ์หุ้น (เช่น VOO, TSLA, PTT.BK):", value="VOO").strip()
+    st.markdown("### 🛠️ กรุณาใส่ชื่อหุ้นที่ต้องการ")
+    ticker = st.text_input("🔤 ถ้าเป็นหุ้นไทยให้ใส่ .bk ด้านหลังชื่อหุ้น เช่น PTT.bk", value="").strip()
     
     st.markdown("---")
     st.markdown("**💡 คำแนะนำเรื่องชื่อหุ้น:**")
