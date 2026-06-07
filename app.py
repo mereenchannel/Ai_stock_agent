@@ -34,7 +34,7 @@ st.markdown("""
 
 # --- ส่วนหัวแอปพลิเคชัน ---
 st.markdown("<h1 style='text-align: center; color: #00b4db;'>📈 AI Quant Trading Agent Pro</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #8f9cae;'>ระบบวิเคราะห์ทางเทคนิคอลและดักจับโครงสร้างเงินทุนรายใหญ่ด้วยสถาปัตยกรรม AI</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #effcff;'>ระบบวิเคราะห์ทางเทคนิคอลและดักจับโครงสร้างเงินทุนรายใหญ่ด้วยสถาปัตยกรรม AI</p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # --- ฟังก์ชันคำนวณทางเทคนิค (สูตรอมตะ) ---
