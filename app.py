@@ -82,6 +82,11 @@ def calculate_ema(df, column="Close", period=20):
     return df[column].ewm(span=period, adjust=False).mean()
 
 def calculate_mcdx_banker(df):
+    """
+    สูตร MCDX ฉบับปรับปรุง (TradingView Sync)
+    เน้นความแข็งแกร่งของเทรนด์ (Momentum) เพื่อไม่ให้หลุดโฟกัสเวลาราคาค่อยๆ ไต่ระดับ
+    """
+    # 1. คำนวณฐานโมเมนตัมด้วย RSI (14)
     delta = df['Close'].diff()
     gain = delta.where(delta > 0, 0)
     loss = -delta.where(delta < 0, 0)
@@ -90,12 +95,16 @@ def calculate_mcdx_banker(df):
     rs = avg_gain / avg_loss
     rsi = 100 - (100 / (1 + rs))
     
-    vol_ma = df['Volume'].rolling(window=20).mean()
-    vol_ratio = df['Volume'] / vol_ma
+    # 2. ถอดรหัสตรรกะ SmartMCDX (ถ้า RSI ยืนเหนือ 50 แปลว่ารายใหญ่เริ่มคุม)
+    # เราใช้ตัวคูณ 4 เพื่อให้กราฟสเกล 0-100 พุ่งเต็มหลอดได้ไวเหมือนกราฟสีแดงใน TradingView
+    banker = (rsi - 50) * 4  
     
-    banker = (rsi - 50) * 1.5 * vol_ratio
+    # 3. ตัดขอบให้อยู่ในสเกล 0-100 เสมอ
     banker = banker.clip(lower=0, upper=100) 
+    
+    # 4. สมูทเส้นกราฟ 3 วันให้เป็นทรงภูเขา ไม่กระชากจนเกินไป
     return banker.rolling(window=3).mean().fillna(0)
+
 
 # --- ส่วนควบคุม (Sidebar/Inputs) ---
 col_input1, col_input2 = st.columns([1, 2])
