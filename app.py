@@ -29,6 +29,26 @@ st.markdown("""
     /* กล่องข้อมูล */
     div[data-testid="stMetricValue"] { color: #00b4db; font-size: 24px; }
     div[data-testid="stMetricLabel"] { color: #effcff; }
+        /* 1. เปลี่ยนสีพื้นหลัง สีขอบ และสีตัวหนังสือในกล่อง Text Input */
+    div[data-testid="stTextInput"] input {
+        background-color: #1e293b !important; /* สีพื้นหลังกล่องแบบเข้ม */
+        color: #00b4db !important; /* สีตัวหนังสือตอนพิมพ์ (ใช้สีฟ้าสว่างให้เด่น) */
+        border: 1px solid #475569 !important; /* สีขอบกล่องปกติ */
+        border-radius: 8px !important;
+    }
+    
+    /* 2. เอฟเฟกต์ตอนที่ผู้ใช้คลิกพิมพ์ (Focus) */
+    div[data-testid="stTextInput"] input:focus {
+        border: 2px solid #00b4db !important; /* ขอบเรืองแสงสีฟ้า */
+        box-shadow: 0 0 10px rgba(0, 180, 219, 0.3) !important;
+    }
+    
+    /* 3. เปลี่ยนสีข้อความกำกับ (Label) ด้านบนกล่อง */
+    div[data-testid="stTextInput"] label p {
+        color: #8f9cae !important; /* สีเทาสว่างให้อ่านง่าย */
+        font-weight: bold;
+    }
+    
     </style>
 """, unsafe_allow_html=True)
 
@@ -154,7 +174,7 @@ with col_input2:
                             """
                             
                             response = llm.invoke(prompt)
-                            st.info(response.content)
+                            st.markdown(response.content)
                             
                     except Exception as ai_error:
                         st.error(f"⚠️ สมอง AI ยังไม่พร้อมทำงานเนื่องจากโควต้าเต็มชั่วคราว: {ai_error}")
