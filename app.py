@@ -9,7 +9,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 st.set_page_config(page_title="AI Quant Trading Agent", page_icon="📈", layout="wide")
 
 st.markdown("""
-        <style>
+    <style>
     /* --- 1. ซ่อนเมนู Streamlit และตั้งค่าพื้นหลัง Dark Mode --- */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -69,24 +69,19 @@ st.markdown("""
         opacity: 0 !important;
     }
     </style>
-
 """, unsafe_allow_html=True)
 
 # --- ส่วนหัวแอปพลิเคชัน ---
 st.markdown("<h1 style='text-align: center; color: #00b4db;'>📈 AI Quant Trading Agent Pro</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #effcff;'>ระบบวิเคราะห์ทางเทคนิคอลและดักจับโครงสร้างเงินทุนรายใหญ่ด้วยสถาปัตยกรรม AI</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #8f9cae;'>ระบบวิเคราะห์ทางเทคนิคอลและดักจับโครงสร้างเงินทุนรายใหญ่ด้วยสถาปัตยกรรม AI</p>", unsafe_allow_html=True)
 st.markdown("---")
 
-# --- ฟังก์ชันคำนวณทางเทคนิค (สูตรอมตะ) ---
+# --- ฟังก์ชันคำนวณทางเทคนิค ---
 def calculate_ema(df, column="Close", period=20):
     return df[column].ewm(span=period, adjust=False).mean()
 
 def calculate_mcdx_banker(df):
-    """
-    สูตร MCDX ฉบับปรับปรุง (TradingView Sync)
-    เน้นความแข็งแกร่งของเทรนด์ (Momentum) เพื่อไม่ให้หลุดโฟกัสเวลาราคาค่อยๆ ไต่ระดับ
-    """
-    # 1. คำนวณฐานโมเมนตัมด้วย RSI (14)
+    """สูตร MCDX ฉบับปรับปรุง (TradingView Sync) สำหรับกราฟรายวัน (1D)"""
     delta = df['Close'].diff()
     gain = delta.where(delta > 0, 0)
     loss = -delta.where(delta < 0, 0)
@@ -95,23 +90,16 @@ def calculate_mcdx_banker(df):
     rs = avg_gain / avg_loss
     rsi = 100 - (100 / (1 + rs))
     
-    # 2. ถอดรหัสตรรกะ SmartMCDX (ถ้า RSI ยืนเหนือ 50 แปลว่ารายใหญ่เริ่มคุม)
-    # เราใช้ตัวคูณ 4 เพื่อให้กราฟสเกล 0-100 พุ่งเต็มหลอดได้ไวเหมือนกราฟสีแดงใน TradingView
     banker = (rsi - 50) * 4  
-    
-    # 3. ตัดขอบให้อยู่ในสเกล 0-100 เสมอ
     banker = banker.clip(lower=0, upper=100) 
-    
-    # 4. สมูทเส้นกราฟ 3 วันให้เป็นทรงภูเขา ไม่กระชากจนเกินไป
     return banker.rolling(window=3).mean().fillna(0)
-
 
 # --- ส่วนควบคุม (Sidebar/Inputs) ---
 col_input1, col_input2 = st.columns([1, 2])
 
 with col_input1:
-    st.markdown("### 🛠️ กรุณาใส่ชื่อหุ้นที่ต้องการ")
-    ticker = st.text_input("🔤 ถ้าเป็นหุ้นไทยให้ใส่ .bk ด้านหลังชื่อหุ้น เช่น PTT.bk", value="").strip()
+    st.markdown("### 🛠️ ตั้งค่าบอทเทรด")
+    ticker = st.text_input("🔤 ใส่สัญลักษณ์หุ้น (เช่น VOO, TSLA, PTT.BK):", value="VOO").strip()
     
     st.markdown("---")
     st.markdown("**💡 คำแนะนำเรื่องชื่อหุ้น:**")
@@ -123,7 +111,7 @@ with col_input2:
     if st.button("🚀 เริ่มวิเคราะห์โครงสร้างราคาและรายใหญ่"):
         with st.spinner("💾 กำลังดึงข้อมูลและประมวลผลอินดิเคเตอร์หลังบ้าน..."):
             try:
-                # 1. ดึงข้อมูลผ่าน Yahoo Finance
+                # 1. ดึงข้อมูลผ่าน Yahoo Finance (รายวันย้อนหลัง 1 ปี)
                 stock = yf.Ticker(ticker)
                 df = stock.history(period="1y")
                 
@@ -147,8 +135,8 @@ with col_input2:
                     m2.metric("เส้น EMA 200 (ภาพใหญ่)", f"{last_row['EMA_200']}")
                     m3.metric("MCDX รายใหญ่ (สีเขียว)", f"{last_row['MCDX_Banker_Green']}%")
                     
-                    # 4. วาดกราฟเทคนิคอลแยกส่วน (เหมือนโปรแกรมเทรดจริง)
-                    st.markdown("#### 📉 กราฟราคา และเส้นค่าเฉลี่ยศัลยกรรมแนวโน้ม (EMA 20, 50, 200)")
+                    # 4. วาดกราฟเทคนิคอลแยกส่วน
+                    st.markdown("#### 📉 กราฟราคา และเส้นค่าเฉลี่ยแนวโน้ม (EMA 20, 50, 200)")
                     chart_data_price = df_60d[['Close', 'EMA_20', 'EMA_50', 'EMA_200']]
                     st.line_chart(chart_data_price)
                     
@@ -156,11 +144,10 @@ with col_input2:
                     chart_data_mcdx = df_60d[['MCDX_Banker_Green']]
                     st.area_chart(chart_data_mcdx, color="#00b4db")
                     
-                    # 5. ส่วนของการเรียกใช้สมอง AI (พรุ่งนี้พอกุญแจพร้อมจะเปิดใช้งานส่วนนี้อัตโนมัติ)
+                    # 5. ส่วนของการเรียกใช้สมอง AI
                     st.markdown("---")
                     st.markdown("### 🧠 บทวิเคราะห์และฟันธงกลยุทธ์จาก AI Agent")
                     
-                    # ดึงสถิติภาพรวม 60 วันส่งให้ AI
                     highest_close = df_60d['Close'].max()
                     lowest_close = df_60d['Close'].min()
                     avg_mcdx_60d = df_60d['MCDX_Banker_Green'].mean()
@@ -175,17 +162,16 @@ with col_input2:
                     """
                     recent_5d_table = df_5d[['Close', 'EMA_20', 'EMA_50', 'EMA_200', 'MCDX_Banker_Green']].to_string()
                     
-                    # ดักจับเรื่อง API Key หลุด/หมดโควต้าชั่วคราว
                     try:
-                        # ตรวจสอบคีย์ในระบบเซิร์ฟเวอร์
+                        # ตรวจสอบคีย์ในระบบ
                         api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
                         
                         if not api_key:
-                            st.warning("🔑 บอทคำนวณกราฟเสร็จแล้ว! แต่ยังไม่ได้เชื่อมต่อกุญแจ API ของ Gemini (รอใส่รหัสพรุ่งนี้เพื่อเปิดระบบตัดสินใจ)")
+                            st.warning("🔑 บอทคำนวณกราฟเสร็จแล้ว! แต่ยังไม่ได้เชื่อมต่อกุญแจ API ของ Gemini (รอใส่รหัสใน Secrets เพื่อเปิดระบบตัดสินใจ)")
                         else:
                             llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", api_key=api_key, temperature=0.1)
                             
-                         prompt = f"""คุณคือ 'ผู้จัดการกองทุนสายเทคนิคอลและผู้เชี่ยวชาญการรันเทรนด์ (Trend Follower)' 
+                            prompt = f"""คุณคือ 'ผู้จัดการกองทุนสายเทคนิคอลและผู้เชี่ยวชาญการรันเทรนด์ (Trend Follower)' 
                             จงวิเคราะห์สถานการณ์ของหุ้นตัวนี้ โดยพิจารณาจากข้อมูลสองส่วนดังนี้:
                             
                             [ส่วนที่ 1: สรุปภาพรวมความเคลื่อนไหวในรอบ 60 วัน]
@@ -211,15 +197,13 @@ with col_input2:
                             
                             โปรดเขียนบทวิเคราะห์ให้เฉียบคม ลึกซึ้ง และมีเหตุผลเชิงสถิติรองรับอย่างมืออาชีพ
                             """
-
-
                             
                             response = llm.invoke(prompt)
-                            st.markdown(response.content)
+                            st.markdown(response.content) # ใช้คำสั่งนี้เพื่อให้สีตัวอักษรเป็นสีขาวอ่านง่าย
                             
                     except Exception as ai_error:
                         st.error(f"⚠️ สมอง AI ยังไม่พร้อมทำงานเนื่องจากโควต้าเต็มชั่วคราว: {ai_error}")
-                        st.info("💡 ข้อแนะนำจาก Mentor: ระบบคำนวณตัวเลขและพล็อตขุดกราฟด้านบนทำงานถูกต้อง 100% แล้วครับ ตอนนี้เหลือเพียงรอเวลาให้โควต้ารายวันของ Google รีเซ็ตใหม่ในวันพรุ่งนี้ ตัวกล่องวิเคราะห์ AI ด้านบนนี้ก็จะสับสวิตช์ทำงานฟันธงหุ้นให้คุณทันทีครับ!")
+                        st.info("💡 ข้อแนะนำจาก Mentor: ระบบคำนวณกราฟทำงานถูกต้องแล้ว รอให้โควต้ารายวันของ Google รีเซ็ต ระบบก็จะฟันธงหุ้นให้คุณทันทีครับ!")
                         
             except Exception as e:
                 st.error(f"❌ เกิดข้อผิดพลาดทางเทคนิคหลังบ้าน: {e}")
