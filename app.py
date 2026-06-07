@@ -72,8 +72,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- ส่วนหัวแอปพลิเคชัน ---
-st.markdown("<h1 style='text-align: center; color: #00b4db;'>📈 AI Trading Agent</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #8f9cae;'>Sidebarse", period=20):
+st.markdown("<h1 style='text-align: center; color: #00b4db;'>📈 AI Trading Agent </h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #8f9cae;'>ระบบวิเคราะห์หุ้นทางเทคนิคด้วยสถาปัตยกรรม AI</p>", unsafe_allow_html=True)
+st.markdown("---")
+
+# --- ฟังก์ชันคำนวณทางเทคนิค ---
+def calculate_ema(df, column="Close", period=20):
     return df[column].ewm(span=period, adjust=False).mean()
 
 def calculate_mcdx_banker(df):
@@ -95,7 +99,7 @@ col_input1, col_input2 = st.columns([1, 2])
 
 with col_input1:
     st.markdown("### 🛠️ ใส่ชื่อหุ้นที่ต้องการวิเคราะห์")
-    ticker = st.text_input("🔤 ใส่สัญลักษณ์หุ้น (เช่น VOO, TSLA, PTT.BK):", value="VOO").strip()
+    ticker = st.text_input("🔤 ใส่สัญลักษณ์หุ้น (เช่น VOO, TSLA, PTT.BK):", value="").strip()
     
     st.markdown("---")
     st.markdown("**💡 คำแนะนำเรื่องชื่อหุ้น:**")
