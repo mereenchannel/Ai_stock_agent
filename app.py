@@ -73,7 +73,7 @@ st.markdown("""
 
 # --- ส่วนหัวแอปพลิเคชัน ---
 st.markdown("<h1 style='text-align: center; color: #00b4db;'>📈 AI Trading Agent </h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #8f9cae;'>ระบบวิเคราะห์หุ้นทางเทคนิคด้วยสถาปัตยกรรม AI</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #8f9cae;'>ระบบวิเคราะห์หุ้นทางเทคนิคด้วยสถาปัตยกรรม AI /n created by Steve R. version beta test</p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # --- ฟังก์ชันคำนวณทางเทคนิค ---
